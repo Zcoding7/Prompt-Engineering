@@ -34,7 +34,7 @@ jobs:
 
       - name: Build Windows EXE
         run: |
-          pyinstaller --onefile --name PromptEngineeringStudio-Windows --add-data "app.py;." --collect-all streamlit --collect-all audio_recorder_streamlit --collect-all speech_recognition run_desktop.py
+          pyinstaller --onefile --name PromptEngineeringStudio-Windows --add-data "app.py;." --collect-all streamlit --collect-all audio_recorder_streamlit --collect-all speech_recognition --collect-all openai --collect-all huggingface_hub --copy-metadata streamlit run_desktop.py
 
       - name: Upload EXE to Release
         uses: softprops/action-gh-release@v2
@@ -67,21 +67,24 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Install dependencies
+      - name: Prepare Flet App Folder
         run: |
-          pip install -r requirements.txt
-          pip install flet
+          mkdir -p mobile_build
+          cp mobile_app.py mobile_build/main.py
+          cp app.py mobile_build/app.py
+          cp requirements.txt mobile_build/requirements.txt
+
+      - name: Install Flet
+        run: pip install flet
 
       - name: Build Android APK
-        run: flet build apk mobile_app.py --project PromptEngineeringStudio
+        run: flet build apk mobile_build --project PromptEngineeringStudio
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
-          files: |
-            build/apk/*.apk
-            dist/*.apk
+          files: mobile_build/build/apk/*.apk
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,21 +105,24 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Install dependencies
+      - name: Prepare Flet App Folder
         run: |
-          pip install -r requirements.txt
-          pip install flet
+          mkdir -p mobile_build
+          cp mobile_app.py mobile_build/main.py
+          cp app.py mobile_build/app.py
+          cp requirements.txt mobile_build/requirements.txt
+
+      - name: Install Flet
+        run: pip install flet
 
       - name: Build iOS IPA
-        run: flet build ipa mobile_app.py --project PromptEngineeringStudio --no-codesign
+        run: flet build ipa mobile_build --project PromptEngineeringStudio --no-codesign
 
       - name: Upload IPA to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
-          files: |
-            build/ipa/*.ipa
-            dist/*.ipa
+          files: mobile_build/build/ipa/*.ipa
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
