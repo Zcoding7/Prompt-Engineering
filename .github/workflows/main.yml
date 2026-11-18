@@ -26,6 +26,20 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Create Windows Launcher
+        shell: python
+        run: |
+          code = """import sys, os
+          def resolve_path(p):
+              return os.path.join(getattr(sys, '_MEIPASS', os.path.dirname(__file__)), p)
+          if __name__ == '__main__':
+              sys.argv = ['streamlit', 'run', resolve_path('app.py'), '--global.developmentMode=false']
+              from streamlit.web import cli as stcli
+              sys.exit(stcli.main())
+          """
+          with open("run_desktop.py", "w") as f:
+              f.write(code)
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -67,24 +81,32 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Prepare Flet App Folder
+      - name: Prepare Flet Project
         run: |
-          mkdir -p mobile_build
-          cp mobile_app.py mobile_build/main.py
-          cp app.py mobile_build/app.py
-          cp requirements.txt mobile_build/requirements.txt
+          mkdir -p mobile_build/src
+          cp mobile_app.py mobile_build/src/main.py
+          cp app.py mobile_build/src/app.py
+          cat << 'EOF' > mobile_build/pyproject.toml
+          [project]
+          name = "prompt-engineering-studio"
+          version = "1.0.1"
+          description = "Prompt Engineering Studio"
+          requires-python = ">=3.10"
+          dependencies = ["flet", "streamlit", "openai", "huggingface-hub", "audio-recorder-streamlit", "SpeechRecognition"]
+          EOF
 
       - name: Install Flet
-        run: pip install flet
+        run: pip install "flet[all]"
 
       - name: Build Android APK
-        run: flet build apk mobile_build --project PromptEngineeringStudio
+        working-directory: mobile_build
+        run: flet build apk --output ./out
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
-          files: mobile_build/build/apk/*.apk
+          files: mobile_build/out/*.apk
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,24 +127,32 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Prepare Flet App Folder
+      - name: Prepare Flet Project
         run: |
-          mkdir -p mobile_build
-          cp mobile_app.py mobile_build/main.py
-          cp app.py mobile_build/app.py
-          cp requirements.txt mobile_build/requirements.txt
+          mkdir -p mobile_build/src
+          cp mobile_app.py mobile_build/src/main.py
+          cp app.py mobile_build/src/app.py
+          cat << 'EOF' > mobile_build/pyproject.toml
+          [project]
+          name = "prompt-engineering-studio"
+          version = "1.0.1"
+          description = "Prompt Engineering Studio"
+          requires-python = ">=3.10"
+          dependencies = ["flet", "streamlit", "openai", "huggingface-hub", "audio-recorder-streamlit", "SpeechRecognition"]
+          EOF
 
       - name: Install Flet
-        run: pip install flet
+        run: pip install "flet[all]"
 
       - name: Build iOS IPA
-        run: flet build ipa mobile_build --project PromptEngineeringStudio --no-codesign
+        working-directory: mobile_build
+        run: flet build ipa --no-codesign --output ./out
 
       - name: Upload IPA to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
-          files: mobile_build/build/ipa/*.ipa
+          files: mobile_build/out/*.ipa
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
