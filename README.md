@@ -40,10 +40,10 @@ Now can download and install the mobile app directly from the Releases panel on 
 4. If prompted, tap Settings and turn on Allow from this source (or Install unknown apps).
 5. Tap Install, then open Prompt Engineering Studio from your home screen.
 
-🍎 iOS Installation (.ios)
+🍎 iOS Installation (.ipa)
 
 Because Apple restricts direct downloads outside the App Store, you can install the .ipa file on your iPhone using a free sideloading tool on your computer:
-1. Go to the Releases section on the right side of this repository and download the PromptEngineeringStudio.ios file onto your Mac or Windows PC.
+1. Go to the Releases section on the right side of this repository and download the PromptEngineeringStudio.ipa file onto your Mac or Windows PC.
 2. Download and install Sideloadly or AltStore on your computer.
 3. Connect your iPhone to your computer using a USB cable.
 4. Drag the PromptEngineeringStudio.ipa file into Sideloadly (or AltStore), enter your Apple ID to sign the app, and click Start.
