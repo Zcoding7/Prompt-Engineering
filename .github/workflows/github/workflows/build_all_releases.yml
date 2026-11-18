@@ -1,4 +1,4 @@
-name: Build Android APK & iOS IPA
+name: Build Windows, Android & iOS Releases
 
 on:
   push:
@@ -9,6 +9,34 @@ permissions:
   contents: write
 
 jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Windows EXE
+        run: |
+          pyinstaller --onefile --name PromptEngineeringStudio-Windows --add-data "app.py;." --collect-all streamlit --collect-all audio_recorder_streamlit --collect-all speech_recognition run_desktop.py
+
+      - name: Upload EXE to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/PromptEngineeringStudio-Windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-android:
     runs-on: ubuntu-latest
     steps:
