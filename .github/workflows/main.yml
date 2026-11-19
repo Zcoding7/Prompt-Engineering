@@ -87,7 +87,7 @@ jobs:
 
       - name: Build Android APK
         working-directory: mobile_build
-        run: yes | flet build apk --yes --module-name main --output ./out
+        run: flet build apk --yes --module-name main --output ./out
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
@@ -121,7 +121,7 @@ jobs:
 
       - name: Build iOS IPA
         working-directory: mobile_build
-        run: yes | flet build ipa --yes --module-name main --no-codesign --output ./out
+        run: flet build ipa --yes --module-name main --output ./out
 
       - name: Upload IPA to Release
         uses: softprops/action-gh-release@v2
