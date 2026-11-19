@@ -71,11 +71,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
       - name: Prepare Flet Project
         run: |
           mkdir -p mobile_build/src
@@ -87,7 +82,7 @@ jobs:
 
       - name: Build Android APK
         working-directory: mobile_build
-        run: flet build apk --output ./out
+        run: yes | flet build apk --yes --output ./out
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
@@ -109,11 +104,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
       - name: Prepare Flet Project
         run: |
           mkdir -p mobile_build/src
@@ -125,7 +115,7 @@ jobs:
 
       - name: Build iOS IPA
         working-directory: mobile_build
-        run: flet build ipa --no-codesign --output ./out
+        run: yes | flet build ipa --yes --no-codesign --output ./out
 
       - name: Upload IPA to Release
         uses: softprops/action-gh-release@v2
