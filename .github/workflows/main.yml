@@ -87,7 +87,10 @@ jobs:
 
       - name: Build Android APK
         working-directory: mobile_build
-        run: flet build apk --yes --module-name main --output ./out
+        run: |
+          set +o pipefail
+          yes | flet build apk --module-name main --output ./out
+          ls -lh ./out/*.apk
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
@@ -119,9 +122,18 @@ jobs:
       - name: Install Flet
         run: pip install "flet[all]"
 
-      - name: Build iOS IPA
+      - name: Build Unsigned iOS IPA
         working-directory: mobile_build
-        run: flet build ipa --yes --module-name main --output ./out
+        run: |
+          set +o pipefail
+          yes | flet build ipa --module-name main --output ./out || true
+          mkdir -p ./out Payload
+          APP_PATH=$(find build -name "*.app" -type d | head -n 1)
+          if [ -n "$APP_PATH" ]; then
+            cp -R "$APP_PATH" Payload/
+            zip -qr ./out/PromptEngineeringStudio-iOS.ipa Payload
+          fi
+          ls -lh ./out/*.ipa
 
       - name: Upload IPA to Release
         uses: softprops/action-gh-release@v2
