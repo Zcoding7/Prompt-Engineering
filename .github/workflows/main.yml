@@ -27,18 +27,13 @@ jobs:
           python-version: '3.11'
 
       - name: Create Windows Launcher
-        shell: python
         run: |
-          code = """import sys, os
-          def resolve_path(p):
-              return os.path.join(getattr(sys, '_MEIPASS', os.path.dirname(__file__)), p)
-          if __name__ == '__main__':
-              sys.argv = ['streamlit', 'run', resolve_path('app.py'), '--global.developmentMode=false']
-              from streamlit.web import cli as stcli
-              sys.exit(stcli.main())
-          """
-          with open("run_desktop.py", "w") as f:
-              f.write(code)
+          echo import sys, os > run_desktop.py
+          echo def resolve_path(p): return os.path.join(getattr(sys, '_MEIPASS', os.path.dirname(__file__)), p) >> run_desktop.py
+          echo if __name__ == '__main__': >> run_desktop.py
+          echo     sys.argv = ['streamlit', 'run', resolve_path('app.py'), '--global.developmentMode=false'] >> run_desktop.py
+          echo     from streamlit.web import cli as stcli >> run_desktop.py
+          echo     sys.exit(stcli.main()) >> run_desktop.py
 
       - name: Install dependencies
         run: |
@@ -85,15 +80,7 @@ jobs:
         run: |
           mkdir -p mobile_build/src
           cp mobile_app.py mobile_build/src/main.py
-          cp app.py mobile_build/src/app.py
-          cat << 'EOF' > mobile_build/pyproject.toml
-          [project]
-          name = "prompt-engineering-studio"
-          version = "1.0.1"
-          description = "Prompt Engineering Studio"
-          requires-python = ">=3.10"
-          dependencies = ["flet", "streamlit", "openai", "huggingface-hub", "audio-recorder-streamlit", "SpeechRecognition"]
-          EOF
+          printf '[project]\nname = "prompt-engineering-studio"\nversion = "1.0.1"\ndependencies = ["flet", "openai", "huggingface-hub"]\n' > mobile_build/pyproject.toml
 
       - name: Install Flet
         run: pip install "flet[all]"
@@ -131,15 +118,7 @@ jobs:
         run: |
           mkdir -p mobile_build/src
           cp mobile_app.py mobile_build/src/main.py
-          cp app.py mobile_build/src/app.py
-          cat << 'EOF' > mobile_build/pyproject.toml
-          [project]
-          name = "prompt-engineering-studio"
-          version = "1.0.1"
-          description = "Prompt Engineering Studio"
-          requires-python = ">=3.10"
-          dependencies = ["flet", "streamlit", "openai", "huggingface-hub", "audio-recorder-streamlit", "SpeechRecognition"]
-          EOF
+          printf '[project]\nname = "prompt-engineering-studio"\nversion = "1.0.1"\ndependencies = ["flet", "openai", "huggingface-hub"]\n' > mobile_build/pyproject.toml
 
       - name: Install Flet
         run: pip install "flet[all]"
